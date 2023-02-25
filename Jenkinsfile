@@ -1,38 +1,102 @@
 pipeline {
    agent any
+
    parameters {
-      string (name: 'DO_DEPLOY', defaultValue: 'false', description: 'Skip all stages and go to deploy')
+      string (name: 'DEPLOY_ONLY', defaultValue: 'false', description: 'Skip all stages and go to deploy')
    }
+
    stages {
+
      stage ('build') {
         when {
-           anyOf {
-              branch 'develop'
-              branch 'test'
+           allOf {              
+             anyOf {
+               branch 'develop'
+               branch 'release-*'
+             }
+             expression { params.DEPLOY_ONLY == 'false' } 
            }
         }
         steps {
            script {
-              echo "Build"
+              echo "******* BUILD STEP ********"
            }
         }
-     }    
-     stage('deploy') {
-       when {
-          allOf {
+     }
+
+     stage ('test') {
+        when {
+           allOf {              
              anyOf {
-                branch 'main'
-                branch 'develop'
+               branch 'develop'
+               branch 'release-*'
              }
-             expression { params.DO_DEPLOY == 'true' } 
+             expression { params.DEPLOY_ONLY == 'false' } 
+           }
+        }
+        steps {
+           script {
+              echo "******* TEST STEP ********"
+           }
+        }
+     }   
+
+     stage('Dev deploy') {
+       when {
+          anyOf {
+             branch 'develop'
+             expression { params.DEPLOY_ONLY == 'true' }
           }
        }
        steps {
          script {
-            echo "Deploy"
+            echo "******* DEV DEPLOY STEP ********"
          }
        }
      }
-   }
+
+     stage('QA deploy') {
+       when {
+          anyOf {
+             branch 'release-*'
+             expression { params.DEPLOY_ONLY == 'true' }
+          }
+       }
+       steps {
+         script {
+            echo "******* QA DEPLOY STEP ********"
+         }
+       }
+     }
+
+     stage('STAGE deploy') {
+       when {
+          anyOf {
+             expression { params.DEPLOY_ONLY == 'true' }
+          }
+       }
+       steps {
+         script {
+            echo "******* STAGE DEPLOY STEP ********"
+         }
+       }
+     }
+
+     stage('PROD deploy') {
+       when {
+          anyOf {
+             expression { params.DEPLOY_ONLY == 'true' }
+          }
+       }
+       steps {
+         script {
+            echo "******* PROD DEPLOY STEP ********"
+         }
+       }
+     }                
+
+
+
+   }   
   
 }
