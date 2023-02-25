@@ -2,7 +2,6 @@ pipeline {
    agent any
    parameters {
       string (name: 'DO_DEPLOY', defaultValue: 'false', description: 'Skip all stages and go to deploy')
-      string ()
    }
    stages {
      stage ('build') {
