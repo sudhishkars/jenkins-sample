@@ -1,26 +1,36 @@
 pipeline {
    agent any
-   environment {
-     DEPLOY_ONLY = 'false'
-   } 
+   parameters {
+      string (name: 'DO_DEPLOY', defaultValue: 'false', description: 'Skip all stages and go to deploy')
+      string ()
+   }
    stages {
-     stage('init') {
+     stage ('build') {
+        when {
+           anyOf {
+              branch 'develop'
+              branch 'test'
+           }
+        }
+        steps {
+           script {
+              echo "Build"
+           }
+        }
+     }    
+     stage('deploy') {
        when {
-//          allOf {
-//            expression { branch 'main' || branch 'develop' }
-//            expression { env.DEPLOY_ONLY == 'true' }
-//          }
           allOf {
              anyOf {
                 branch 'main'
                 branch 'develop'
              }
-             expression { env.DEPLOY_ONLY == 'true' } 
+             expression { params.DO_DEPLOY == 'true' } 
           }
        }
        steps {
          script {
-            echo "INIT STEP"
+            echo "Deploy"
          }
        }
      }
