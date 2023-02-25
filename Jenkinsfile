@@ -1,7 +1,7 @@
 pipeline {
    agent any
    envrionment {
-     DEPLOY_ONLY = 'true'
+     DEPLOY_ONLY = 'false'
    } 
    stages {
      stage('init') {
