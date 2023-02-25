@@ -1,6 +1,6 @@
 pipeline {
    agent any
-   envrionment {
+   environment {
      DEPLOY_ONLY = 'true'
    } 
    stages {
